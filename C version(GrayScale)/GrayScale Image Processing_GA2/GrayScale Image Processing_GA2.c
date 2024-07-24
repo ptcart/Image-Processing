@@ -1,13 +1,13 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#include <Windows.h> // GUI ±â´É Áö¿ø
+#include <Windows.h> // GUI ê¸°ëŠ¥ ì§€ì›
 #include <math.h>
 
 ///////////////////
-// Àü¿ª º¯¼ö ¼±¾ğºÎ
+// ì „ì—­ ë³€ìˆ˜ ì„ ì–¸ë¶€
 ///////////////////
-HWND  hwnd; //  À©µµ È­¸é(¿ÜºÎ, ¹°¸®Àû)
-HDC hdc; // À©µµ È­¸é(³»ºÎ, ³í¸®Àû)
+HWND  hwnd; //  ìœˆë„ í™”ë©´(ì™¸ë¶€, ë¬¼ë¦¬ì )
+HDC hdc; // ìœˆë„ í™”ë©´(ë‚´ë¶€, ë…¼ë¦¬ì )
 
 
 int oriH, oriW, tarH, tarW;
@@ -16,17 +16,17 @@ unsigned char** tarImage = NULL;
 
 unsigned char** comImage = NULL;
 
-char filename[200];  // ÆÄÀÏ¸í
+char filename[200];  // íŒŒì¼ëª…
 
 ///////////////////
-// ÇÔ¼ö ¼±¾ğºÎ
+// í•¨ìˆ˜ ì„ ì–¸ë¶€
 ///////////////////
-// °øÅë ÇÔ¼öºÎ
+// ê³µí†µ í•¨ìˆ˜ë¶€
 void loadImage(); void saveImage(); void displayImage(int x, int y); void printMenu();
 void mallocOriImage(); void mallocTarImage(); void mallocTarImage2(); void freeOriImage(); void freeTarImage(); void freeTarImage2();
 void mallocComImage(); void freeComImage();
-// ¿µ»óÃ³¸® ÇÔ¼öºÎ
-// È­¼ÒÁ¡ Ã³¸®
+// ì˜ìƒì²˜ë¦¬ í•¨ìˆ˜ë¶€
+// í™”ì†Œì  ì²˜ë¦¬
 void equalImage();
 void addImage(); void mulImage(); void divImage();
 void reverseImage();
@@ -39,23 +39,23 @@ void emboss(); void blurr(); void sharpening(); void edge1(); void edge2();
 
 void printMenu() {
 	puts("\n GrayScale Image Processing (GA 2)");
-	puts("\n 1.¿­±â  2.ÀúÀå  9.Á¾·á");
-	puts("\n -------------------------------------È­¼Ò Á¡ Ã³¸®--------------------------------------------");
-	puts("\n A.µ¿ÀÏ¿µ»ó  B.¹à°Ô/¾îµÓ°Ô  C.¹İÀü  D.ÀÌÁøÈ­");
-	puts("\n E.°¨¸¶º¸Á¤  F.AND  G.OR  H.XOR  I.NOT  J.Æ÷½ºÆ®¶óÀÌÂ¡  K.¹üÀ§°­Á¶ º¯È¯  L.ÆÄ¶óº¼¶ó º¯È¯ ");
-	puts("\n -------------------------------------±âÇÏÇĞ Ã³¸®-------------------------------------");
-	puts("\n M.È®´ë(Æ÷¿öµù)  N.È®´ë(¹é¿öµù)  O.Ãà¼Ò  P.È¸Àü  Q.È¸Àü(¼öÁ¤)  R.ÀÌµ¿  S.»óÇÏ¹İÀü  T.ÁÂ¿ì¹İÀü  %.È¸ÀüÈ®´ë  ^.È®´ë(¾ç¼±Çü º¸°£)");
-	puts("\n -------------------------------------È÷½ºÅä±×·¥À» ÀÌ¿ëÇÑ È­¼Ò Á¡ Ã³¸®-------------------------------------");
-	puts("\n U.¿£µå-ÀÎ  W.ÆòÈ°È­  X.È÷½ºÅä±×·¥ ½ºÆ®·¡Äª  Y.¸í¼¼È­");
-	puts("\n -------------------------------------È­¼Ò¿µ¿ªÃ³¸® / ¿¡Áö°ËÃâ-------------------------------------");
-	puts("\n Z.¿¥º¸½Ì  !.ºí·¯¸µ  @.»şÇÁ´×  #.¼öÁ÷¿¡Áö  $.¼öÆò¿¡Áö");
+	puts("\n 1.ì—´ê¸°  2.ì €ì¥  9.ì¢…ë£Œ");
+	puts("\n --- í™”ì†Œ ì  ì²˜ë¦¬ ---");
+	puts("\n A.ë™ì¼ì˜ìƒ  B.ë°ê²Œ/ì–´ë‘¡ê²Œ  C.ë°˜ì „  D.ì´ì§„í™”");
+	puts("\n E.ê°ë§ˆë³´ì •  F.AND  G.OR  H.XOR  I.NOT  J.í¬ìŠ¤íŠ¸ë¼ì´ì§•  K.ë²”ìœ„ê°•ì¡° ë³€í™˜  L.íŒŒë¼ë³¼ë¼ ë³€í™˜ ");
+	puts("\n --- ê¸°í•˜í•™ ì²˜ë¦¬ ---");
+	puts("\n M.í™•ëŒ€(í¬ì›Œë”©)  N.í™•ëŒ€(ë°±ì›Œë”©)  O.ì¶•ì†Œ  P.íšŒì „  Q.íšŒì „(ìˆ˜ì •)  R.ì´ë™  S.ìƒí•˜ë°˜ì „  T.ì¢Œìš°ë°˜ì „  %.íšŒì „í™•ëŒ€  ^.í™•ëŒ€(ì–‘ì„ í˜• ë³´ê°„)");
+	puts("\n --- íˆìŠ¤í† ê·¸ë¨ì„ ì´ìš©í•œ í™”ì†Œ ì  ì²˜ë¦¬ ---");
+	puts("\n U.ì—”ë“œ-ì¸  W.í‰í™œí™”  X.íˆìŠ¤í† ê·¸ë¨ ìŠ¤íŠ¸ë˜ì¹­  Y.ëª…ì„¸í™”");
+	puts("\n --- í™”ì†Œì˜ì—­ì²˜ë¦¬ / ì—ì§€ê²€ì¶œ ---");
+	puts("\n Z.ì— ë³´ì‹±  !.ë¸”ëŸ¬ë§  @.ìƒ¤í”„ë‹  #.ìˆ˜ì§ì—ì§€  $.ìˆ˜í‰ì—ì§€");
 }
 ///////////////////
-// ¸ŞÀÎ ÄÚµåºÎ
+// ë©”ì¸ ì½”ë“œë¶€
 ///////////////////
 void main() {
 	hwnd = GetForegroundWindow();
-	hdc = GetWindowDC(hwnd);  // À©µµ10¿ë.  À©µµ11(hwnd--> NULL)
+	hdc = GetWindowDC(hwnd);  // ìœˆë„10ìš©.  ìœˆë„11(hwnd--> NULL)
 
 	char key = 0;
 	while (key != '9') {
@@ -125,13 +125,13 @@ void main() {
 		case '9': freeOriImage(); freeTarImage(); break;
 		}
 	}
-	puts("¾È³çÈ÷ °¡¼¼¿ä~~ µµºñ´Â ÀÚÀ¯¿¡¿ä...");
+	puts("ì•ˆë…•íˆ ê°€ì„¸ìš”~~ ë„ë¹„ëŠ” ììœ ì—ìš”...");
 
 
 }
 
 ////////////////////
-/// ÇÔ¼ö Á¤ÀÇºÎ
+/// í•¨ìˆ˜ ì •ì˜ë¶€
 ////////////////
 void mallocOriImage() {
 	oriImage = (unsigned char**)malloc(sizeof(unsigned char*) * oriH);
@@ -176,28 +176,28 @@ void freeComImage() {
 void loadImage() {
 	char fullname[200] = "C:/RAW/Etc_Raw(squre)/";
 	char tmpName[50];
-	printf("ÆÄÀÏ¸í-->"); scanf("%s", tmpName);  // cat01, dog05, etc11
+	printf("íŒŒì¼ëª…-->"); scanf("%s", tmpName);  // cat01, dog05, etc11
 	strcat(fullname, tmpName);
 	strcat(fullname, ".raw");
 	strcpy(filename, fullname);
 
-	//(Áß¿ä!) ¿øº»¿µ»óÀÇ Å©±â¸¦ ÆÄ¾Ç!
+	//(ì¤‘ìš”!) ì›ë³¸ì˜ìƒì˜ í¬ê¸°ë¥¼ íŒŒì•…!
 	FILE* rfp;
 	rfp = fopen(filename, "rb");
 	if (!rfp) {
-		printf("ÆÄÀÏ¸í Æ²·ÈÀ½~ \n");
+		printf("íŒŒì¼ëª… í‹€ë ¸ìŒ~ \n");
 		return;
 	}
-	fseek(rfp, 0L, SEEK_END); // ÆÄÀÏÀÇ ³¡À¸·Î ÀÌµ¿
+	fseek(rfp, 0L, SEEK_END); // íŒŒì¼ì˜ ëìœ¼ë¡œ ì´ë™
 	long long fsize = ftell(rfp);
 	fclose(rfp);
-	// ¿øº» ¿µ»ó Å©±â
+	// ì›ë³¸ ì˜ìƒ í¬ê¸°
 	oriH = oriW = sqrt(fsize);
-	// 2Â÷¿ø ¸Ş¸ğ¸® ÇÒ´ç
+	// 2ì°¨ì› ë©”ëª¨ë¦¬ í• ë‹¹
 	freeOriImage();
 	mallocOriImage();
 
-	// ÆÄÀÏ --> ¸Ş¸ğ¸®
+	// íŒŒì¼ --> ë©”ëª¨ë¦¬
 	rfp = fopen(filename, "rb");
 	for (int i = 0; i < oriH; i++)
 		fread(oriImage[i], sizeof(unsigned char), oriW, rfp);
@@ -209,19 +209,19 @@ void loadImage() {
 void saveImage() {
 	char fullname[200] = "C:/RAW/Pet_RAW(squre)/Pet_RAW(512x512)/";
 	char tmpName[50];
-	printf("ÀúÀå ÆÄÀÏ¸í-->"); scanf("%s", tmpName);  // out01, out02 ....
+	printf("ì €ì¥ íŒŒì¼ëª…-->"); scanf("%s", tmpName);  // out01, out02 ....
 	strcat(fullname, tmpName);
 	strcat(fullname, "_512.raw");
 	strcpy(filename, fullname);
 
 	FILE* wfp;
 	wfp = fopen(filename, "wb");
-	// ¸Ş¸ğ¸® >> ÆÄÀÏ
+	// ë©”ëª¨ë¦¬ >> íŒŒì¼
 	for (int i = 0; i < tarH; i++) {
 		fwrite(tarImage[i], sizeof(unsigned char), tarW, wfp);
 	}
 	fclose(wfp);
-	printf("%s ·Î ÀúÀåµÊ", filename);
+	printf("%s ë¡œ ì €ì¥ë¨", filename);
 }
 void displayImage(int x, int y) {
 	for (int i = 0; i < tarH; i++) {
@@ -232,18 +232,18 @@ void displayImage(int x, int y) {
 	}
 }
 /// <summary>
-///  ¿µ»óÃ³¸® ÇÔ¼öºÎ
+///  ì˜ìƒì²˜ë¦¬ í•¨ìˆ˜ë¶€
 /// </summary>
 void equalImage() {
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = oriImage[i][k];
@@ -254,17 +254,17 @@ void equalImage() {
 }
 void addImage() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	int value;
-	printf("´õÇÒ °ª(-255~+255) :");  scanf("%d", &value);
+	printf("ë”í•  ê°’(-255~+255) :");  scanf("%d", &value);
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			int pixel = oriImage[i][k] + value;
@@ -280,17 +280,17 @@ void addImage() {
 }
 void mulImage() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	int value;
-	printf("°öÇÒ °ª :");  scanf(" %d", &value);
+	printf("ê³±í•  ê°’ :");  scanf(" %d", &value);
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			int pixel = oriImage[i][k] * value;
@@ -306,17 +306,17 @@ void mulImage() {
 }
 void divImage() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	int value;
-	printf("³ª´­ °ª :");  scanf("%d", &value);
+	printf("ë‚˜ëˆŒ ê°’ :");  scanf("%d", &value);
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			int pixel = oriImage[i][k] / value;
@@ -330,17 +330,17 @@ void divImage() {
 	///////////////////////////////
 	displayImage(300, 550);
 }
-void reverseImage() {  // ¹İÀü : 0>255, 1>254, 2>253..... 254>1, 255>0
+void reverseImage() {  // ë°˜ì „ : 0>255, 1>254, 2>253..... 254>1, 255>0
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = 255 - oriImage[i][k];
@@ -351,15 +351,15 @@ void reverseImage() {  // ¹İÀü : 0>255, 1>254, 2>253..... 254>1, 255>0
 }
 void binaryImage() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = oriImage[i][k];
@@ -380,15 +380,15 @@ void binaryImage() {
 void gammaImage() {
 	equalImage();
 	int gamma;
-	printf("°¨¸¶ Á¤µµ : "); scanf("%d", &gamma);
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	printf("ê°ë§ˆ ì •ë„ : "); scanf("%d", &gamma);
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = oriImage[i][k] / gamma;
@@ -399,14 +399,14 @@ void gammaImage() {
 }
 void orImage() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
-	// comImage[oriH][oriW] Å©±â·Î ÇÒ´ç
+	// comImage[oriH][oriW] í¬ê¸°ë¡œ í• ë‹¹
 	freeComImage();
 	mallocComImage();
 
@@ -418,7 +418,7 @@ void orImage() {
 			comImage[i][k] = 255;
 		}
 	}
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = oriImage[i][k];
@@ -442,14 +442,14 @@ void orImage() {
 }
 void andImage() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
-	// comImage[oriH][oriW] Å©±â·Î ÇÒ´ç
+	// comImage[oriH][oriW] í¬ê¸°ë¡œ í• ë‹¹
 	freeComImage();
 	mallocComImage();
 	for (int i = 0; i < oriH; i++) {
@@ -460,13 +460,13 @@ void andImage() {
 			comImage[i][k] = 255;
 		}
 	}
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = oriImage[i][k];
 		}
 	}
-	// and ¾Ë°í¸®Áò
+	// and ì•Œê³ ë¦¬ì¦˜
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			if ((tarImage[i][k] & comImage[i][k]) >= 255) {
@@ -484,14 +484,14 @@ void andImage() {
 }
 void xorImage() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
-	// comImage[oriH][oriW] Å©±â·Î ÇÒ´ç
+	// comImage[oriH][oriW] í¬ê¸°ë¡œ í• ë‹¹
 	freeComImage();
 	mallocComImage();
 	for (int i = 0; i < oriH; i++) {
@@ -502,13 +502,13 @@ void xorImage() {
 			comImage[i][k] = 255;
 		}
 	}
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = oriImage[i][k];
 		}
 	}
-	// xor ¾Ë°í¸®Áò
+	// xor ì•Œê³ ë¦¬ì¦˜
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			if ((tarImage[i][k] ^ comImage[i][k]) >= 255) {
@@ -526,21 +526,21 @@ void xorImage() {
 }
 void notImage() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = oriImage[i][k];
 		}
 	}
-	// not ¾Ë°í¸®Áò
+	// not ì•Œê³ ë¦¬ì¦˜
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			if (!(tarImage[i][k]) >= 255) {
@@ -558,15 +558,15 @@ void notImage() {
 }
 void postRising() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = oriImage[i][k];
@@ -574,7 +574,7 @@ void postRising() {
 	}
 	int value;
 	int div;
-	printf("°æ°è °ª : "); scanf("%d", &value);
+	printf("ê²½ê³„ ê°’ : "); scanf("%d", &value);
 	div = 255 / value;
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
@@ -593,15 +593,15 @@ void postRising() {
 void rangeImage() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = oriImage[i][k];
@@ -609,7 +609,7 @@ void rangeImage() {
 	}
 	int start;
 	int end;
-	printf("¹üÀ§ °ª(2°³ / 0~255) : "); scanf("%d %d", &start, &end);
+	printf("ë²”ìœ„ ê°’(2ê°œ / 0~255) : "); scanf("%d %d", &start, &end);
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			if (start <= tarImage[i][k] && tarImage[i][k] <= end)
@@ -622,15 +622,15 @@ void rangeImage() {
 void paraImage() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = oriImage[i][k];
@@ -648,27 +648,27 @@ void paraImage() {
 }
 void zoomOut() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	int scale;
-	printf("Ãà¼Ò ¹èÀ²:"); scanf("%d", &scale);
+	printf("ì¶•ì†Œ ë°°ìœ¨:"); scanf("%d", &scale);
 	tarH = (int)(oriH / scale);
 	tarW = (int)(oriW / scale);
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriH; k++) {
 			tarImage[i / scale][k / scale] = oriImage[i][k];
 		}
 	}
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarH; k++) {
-			tarImage[i][k] = oriImage[i * scale][k * scale]; //¹é¿öµù ¹æ½Ä
+			tarImage[i][k] = oriImage[i * scale][k * scale]; //ë°±ì›Œë”© ë°©ì‹
 		}
 	}
 
@@ -678,16 +678,16 @@ void zoomOut() {
 void zoomIn() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	int scale;
-	printf("È®´ë ¹èÀ²:"); scanf("%d", &scale);
+	printf("í™•ëŒ€ ë°°ìœ¨:"); scanf("%d", &scale);
 	tarH = (int)(oriH * scale);
 	tarW = (int)(oriW * scale);
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç	
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹	
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i * scale][k * scale] = oriImage[i][k];
@@ -699,16 +699,16 @@ void zoomIn() {
 void zoomIn2() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	int scale;
-	printf("È®´ë ¹èÀ²:"); scanf("%d", &scale);
+	printf("í™•ëŒ€ ë°°ìœ¨:"); scanf("%d", &scale);
 	tarH = (int)(oriH * scale);
 	tarW = (int)(oriW * scale);
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç	
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹	
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			tarImage[i][k] = oriImage[i / scale][k / scale];
@@ -720,18 +720,18 @@ void zoomIn2() {
 void zoomIn3() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	int scale;
-	printf("È®´ë ¹èÀ²:"); scanf("%d", &scale);
+	printf("í™•ëŒ€ ë°°ìœ¨:"); scanf("%d", &scale);
 	tarH = (int)(oriH * scale);
 	tarW = (int)(oriW * scale);
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç	
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹	
 	mallocTarImage();
 
 	int iScale;
 	int kScale;
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			iScale = i / scale;
@@ -746,18 +746,18 @@ void zoomIn3() {
 void rotate() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	int angle;
-	printf("È¸Àü°¢µµ : "); scanf("%d", &angle);
-	//È¸Àü ¼ö½Ä
+	printf("íšŒì „ê°ë„ : "); scanf("%d", &angle);
+	//íšŒì „ ìˆ˜ì‹
 	// tar_X = cos * oriX - sin * oriY
 	// tar_y = sin * oriX + cos * oriY
 
@@ -782,18 +782,18 @@ void rotate() {
 void rotate2() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	int angle;
-	printf("È¸Àü°¢µµ : "); scanf("%d", &angle);
-	//È¸Àü ¼ö½Ä
+	printf("íšŒì „ê°ë„ : "); scanf("%d", &angle);
+	//íšŒì „ ìˆ˜ì‹
 	// oriX = cos * (tarX - Cx) + sin(tarY - Cy) + Cx
 	// oriY = -sin * (tarX - Cx) + cos * (tarY - Cy) + Cy
 	int Cx = oriH / 2;
@@ -818,20 +818,20 @@ void rotate2() {
 void move1() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	int dX;
 	int dY;
-	printf("X °ª : "); scanf("%d", &dX);
-	printf("Y °ª : "); scanf("%d", &dY);
-	//ÀÌµ¿ ¼ö½Ä
+	printf("X ê°’ : "); scanf("%d", &dX);
+	printf("Y ê°’ : "); scanf("%d", &dY);
+	//ì´ë™ ìˆ˜ì‹
 	// tarX = oriX + dX
 	// tarY = oriY + dY
 
@@ -852,16 +852,16 @@ void move1() {
 void UDmirror() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 
-	// »óÇÏ ¹İÀü ¼ö½Ä
+	// ìƒí•˜ ë°˜ì „ ìˆ˜ì‹
 	// tarX = oriX 
 	// tarY = -Y + 2Y0
 	int X0 = oriW / 2;
@@ -882,16 +882,16 @@ void UDmirror() {
 void LRmirror() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 
-	// »óÇÏ ¹İÀü ¼ö½Ä
+	// ìƒí•˜ ë°˜ì „ ìˆ˜ì‹
 	// tarX = oriX 
 	// tarY = -Y + 2Y0
 	int Y0 = oriH / 2;
@@ -912,9 +912,9 @@ void LRmirror() {
 void rotatezoom() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	int angle;
-	printf("È¸Àü°¢µµ : "); scanf("%d", &angle);
+	printf("íšŒì „ê°ë„ : "); scanf("%d", &angle);
 
 	double radian = angle * 3.141592 / 180.0;
 	double radian90 = (90 - angle) * 3.141592 / 180.0;
@@ -926,15 +926,15 @@ void rotatezoom() {
 	int oriCy = oriW / 2;
 	int tarCx = tarH / 2;
 	int tarCy = tarW / 2;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	mallocTarImage();
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			tarImage[i][k] = 0;
 		}
 	}
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	int tarX, tarY, oriX, oriY;
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
@@ -952,15 +952,15 @@ void rotatezoom() {
 }
 void histoStretch() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// ¼ö½Ä : new = (old - low) / (high - low) * 255.0
+	// ìˆ˜ì‹ : new = (old - low) / (high - low) * 255.0
 	int low, high;
 	low = high = oriImage[0][0];
 
@@ -976,7 +976,7 @@ void histoStretch() {
 	}
 
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = (double)(oriImage[i][k] - low) / (high - low) * 255;
@@ -987,15 +987,15 @@ void histoStretch() {
 }
 void endIn() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// ¼ö½Ä : new = (old - low) / (high - low) * 255.0
+	// ìˆ˜ì‹ : new = (old - low) / (high - low) * 255.0
 	int low, high;
 	low = high = oriImage[0][0];
 
@@ -1012,7 +1012,7 @@ void endIn() {
 
 	low = low + 50;
 	high = high - 50;
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			double newVal = (double)(oriImage[i][k] - low) / (high - low) * 255;
@@ -1029,22 +1029,22 @@ void endIn() {
 void histoEqual() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tarImage[i][k] = oriImage[i][k];
 		}
 	}
 
-	// 1´Ü°è : ºóµµ¼ö È÷½ºÅä±×·¥ »ı¼º
+	// 1ë‹¨ê³„ : ë¹ˆë„ìˆ˜ íˆìŠ¤í† ê·¸ë¨ ìƒì„±
 	int hist[256] = { 0, };
 
 	for (int i = 0; i < tarH; i++) {
@@ -1052,18 +1052,18 @@ void histoEqual() {
 			hist[tarImage[i][k]]++;
 		}
 	}
-	// 2´Ü°è : ´©Àû È÷½ºÅä±×·¥ »ı¼º
+	// 2ë‹¨ê³„ : ëˆ„ì  íˆìŠ¤í† ê·¸ë¨ ìƒì„±
 	int sum[256];
 	sum[0] = hist[0];
 	for (int i = 1; i < 256; i++) {
 		sum[i] = hist[i] + sum[i - 1];
 	}
-	// 3´Ü°è : Á¤±ÔÈ­µÈ È÷½ºÅä±×·¥ »ı¼º
+	// 3ë‹¨ê³„ : ì •ê·œí™”ëœ íˆìŠ¤í† ê·¸ë¨ ìƒì„±
 	double n[256] = { 0.0, };
 	for (int i = 0; i < 256; i++) {
 		n[i] = sum[i] * (1.0 / (oriW * oriH)) * 255.0;
 	}
-	// 4´Ü°è : ¿ø·¡°ªÀ» Á¤±ÔÈ­µÈ °ªÀ¸·Î Ä¡È¯
+	// 4ë‹¨ê³„ : ì›ë˜ê°’ì„ ì •ê·œí™”ëœ ê°’ìœ¼ë¡œ ì¹˜í™˜
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			tarImage[i][k] = (unsigned char)n[oriImage[i][k]];
@@ -1089,44 +1089,44 @@ void freeDouble(double** memory, int h) {
 }
 void emboss() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
-	//const int MSIZE = 3; // ¸¶½ºÅ© Å©±â
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
+	//const int MSIZE = 3; // ë§ˆìŠ¤í¬ í¬ê¸°
 #define MSIZE 3
 	double mask[MSIZE][MSIZE] = {
 		{ 1.0, 0.0, 0.0 },
 		{ 0.0, 0.0, 0.0 },
 		{ 0.0, 0.0,-1.0 } };
 
-	// ÀÓ½Ã ÀÔÃâ·Â ¸Ş¸ğ¸® ÁØºñ
+	// ì„ì‹œ ì…ì¶œë ¥ ë©”ëª¨ë¦¬ ì¤€ë¹„
 	double** tmpOriImage, ** tmpTarImage;
 	tmpOriImage = mallocDouble(oriH + 2, oriW + 2);
 	tmpTarImage = mallocDouble(tarH, tarW);
-	// ÀÓ½Ã ¿øº» ÀÌ¹ÌÁö¿¡ 127 Ã¤¿ì±â(Æò±Õ°ªÀÌ ´õ ³ªÀ»µí...)
+	// ì„ì‹œ ì›ë³¸ ì´ë¯¸ì§€ì— 127 ì±„ìš°ê¸°(í‰ê· ê°’ì´ ë” ë‚˜ì„ë“¯...)
 	for (int i = 0; i < oriH + 2; i++) {
 		for (int k = 0; k < oriW + 2; k++) {
 			tmpOriImage[i][k] = 127.0;
 		}
 	}
-	// ¿øº» -> ÀÓ½Ã ¿øº»
+	// ì›ë³¸ -> ì„ì‹œ ì›ë³¸
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tmpOriImage[i + 1][k + 1] = oriImage[i][k];
 		}
 	}
-	// È¸¼± ¿¬»ê ---> ¸¶½ºÅ©·Î ±Ü¾î°¡¸é¼­ °è»êÇÏ±â
-	double S = 0; // °¢ Á¡¿¡ ´ëÇÑ ¸¶½ºÅ© ¿¬»ê ÇÕ°è
+	// íšŒì„  ì—°ì‚° ---> ë§ˆìŠ¤í¬ë¡œ ê¸ì–´ê°€ë©´ì„œ ê³„ì‚°í•˜ê¸°
+	double S = 0; // ê° ì ì— ëŒ€í•œ ë§ˆìŠ¤í¬ ì—°ì‚° í•©ê³„
 
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
-			S = 0.0; // ´©Àû ÃÊ±âÈ­
+			S = 0.0; // ëˆ„ì  ì´ˆê¸°í™”
 			for (int m = 0; m < MSIZE; m++) {
 				for (int n = 0; n < MSIZE; n++) {
 					S += mask[m][n] * tmpOriImage[i + m][k + n];
@@ -1136,13 +1136,13 @@ void emboss() {
 			tarImage[i][k] = oriImage[i][k];
 		}
 	}
-	// Post Processing (ÈÄÃ³¸®). ¸¶½ºÅ© ÇÕ°è°¡ 0ÀÌ¸é 127Á¤µµ¸¦ ´õÇÔ.
+	// Post Processing (í›„ì²˜ë¦¬). ë§ˆìŠ¤í¬ í•©ê³„ê°€ 0ì´ë©´ 127ì •ë„ë¥¼ ë”í•¨.
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			tmpTarImage[i][k] += 127.0;
 		}
 	}
-	// ÀÓ½Ã Å¸°Ù --> Å¸°Ù
+	// ì„ì‹œ íƒ€ê²Ÿ --> íƒ€ê²Ÿ
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			double v = tmpTarImage[i][k];
@@ -1165,42 +1165,42 @@ void emboss() {
 void blurr() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
-	//const int MSIZE = 3; // ¸¶½ºÅ© Å©±â
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
+	//const int MSIZE = 3; // ë§ˆìŠ¤í¬ í¬ê¸°
 #define MSIZE 3
 	double mask[MSIZE][MSIZE] = {
 		{ 1.0 / 9, 1.0 / 9, 1.0 / 9 },
 		{ 1.0 / 9, 1.0 / 9, 1.0 / 9 },
 		{ 1.0 / 9, 1.0 / 9, 1.0 / 9 } };
 
-	// ÀÓ½Ã ÀÔÃâ·Â ¸Ş¸ğ¸® ÁØºñ
+	// ì„ì‹œ ì…ì¶œë ¥ ë©”ëª¨ë¦¬ ì¤€ë¹„
 	double** tmpOriImage, ** tmpTarImage;
 	tmpOriImage = mallocDouble(oriH + 2, oriW + 2);
 	tmpTarImage = mallocDouble(tarH, tarW);
-	// ÀÓ½Ã ¿øº» ÀÌ¹ÌÁö¿¡ 127 Ã¤¿ì±â(Æò±Õ°ªÀÌ ´õ ³ªÀ»µí...)
+	// ì„ì‹œ ì›ë³¸ ì´ë¯¸ì§€ì— 127 ì±„ìš°ê¸°(í‰ê· ê°’ì´ ë” ë‚˜ì„ë“¯...)
 	for (int i = 0; i < oriH + 2; i++) {
 		for (int k = 0; k < oriW + 2; k++) {
 			tmpOriImage[i][k] = 127.0;
 		}
 	}
-	// ¿øº» -> ÀÓ½Ã ¿øº»
+	// ì›ë³¸ -> ì„ì‹œ ì›ë³¸
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tmpOriImage[i + 1][k + 1] = oriImage[i][k];
 		}
 	}
-	// È¸¼± ¿¬»ê ---> ¸¶½ºÅ©·Î ±Ü¾î°¡¸é¼­ °è»êÇÏ±â
-	double S = 0; // °¢ Á¡¿¡ ´ëÇÑ ¸¶½ºÅ© ¿¬»ê ÇÕ°è
+	// íšŒì„  ì—°ì‚° ---> ë§ˆìŠ¤í¬ë¡œ ê¸ì–´ê°€ë©´ì„œ ê³„ì‚°í•˜ê¸°
+	double S = 0; // ê° ì ì— ëŒ€í•œ ë§ˆìŠ¤í¬ ì—°ì‚° í•©ê³„
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
-			S = 0.0; // ´©Àû ÃÊ±âÈ­
+			S = 0.0; // ëˆ„ì  ì´ˆê¸°í™”
 			for (int m = 0; m < MSIZE; m++) {
 				for (int n = 0; n < MSIZE; n++) {
 					S += mask[m][n] * tmpOriImage[i + m][k + n];
@@ -1210,7 +1210,7 @@ void blurr() {
 			tarImage[i][k] = oriImage[i][k];
 		}
 	}
-	// ÀÓ½Ã Å¸°Ù --> Å¸°Ù
+	// ì„ì‹œ íƒ€ê²Ÿ --> íƒ€ê²Ÿ
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			double v = tmpTarImage[i][k];
@@ -1233,42 +1233,42 @@ void blurr() {
 void sharpening() {
 	equalImage();
 	freeTarImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
-	//const int MSIZE = 3; // ¸¶½ºÅ© Å©±â
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
+	//const int MSIZE = 3; // ë§ˆìŠ¤í¬ í¬ê¸°
 #define MSIZE 3
 	double mask[MSIZE][MSIZE] = {
 		{ -1.0, -1.0, -1.0 },
 		{ -1.0,  9.0, -1.0 },
 		{ -1.0, -1.0, -1.0 } };
 
-	// ÀÓ½Ã ÀÔÃâ·Â ¸Ş¸ğ¸® ÁØºñ
+	// ì„ì‹œ ì…ì¶œë ¥ ë©”ëª¨ë¦¬ ì¤€ë¹„
 	double** tmpOriImage, ** tmpTarImage;
 	tmpOriImage = mallocDouble(oriH + 2, oriW + 2);
 	tmpTarImage = mallocDouble(tarH, tarW);
-	// ÀÓ½Ã ¿øº» ÀÌ¹ÌÁö¿¡ 127 Ã¤¿ì±â(Æò±Õ°ªÀÌ ´õ ³ªÀ»µí...)
+	// ì„ì‹œ ì›ë³¸ ì´ë¯¸ì§€ì— 127 ì±„ìš°ê¸°(í‰ê· ê°’ì´ ë” ë‚˜ì„ë“¯...)
 	for (int i = 0; i < oriH + 2; i++) {
 		for (int k = 0; k < oriW + 2; k++) {
 			tmpOriImage[i][k] = 127.0;
 		}
 	}
-	// ¿øº» -> ÀÓ½Ã ¿øº»
+	// ì›ë³¸ -> ì„ì‹œ ì›ë³¸
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tmpOriImage[i + 1][k + 1] = oriImage[i][k];
 		}
 	}
-	// È¸¼± ¿¬»ê ---> ¸¶½ºÅ©·Î ±Ü¾î°¡¸é¼­ °è»êÇÏ±â
-	double S = 0; // °¢ Á¡¿¡ ´ëÇÑ ¸¶½ºÅ© ¿¬»ê ÇÕ°è
+	// íšŒì„  ì—°ì‚° ---> ë§ˆìŠ¤í¬ë¡œ ê¸ì–´ê°€ë©´ì„œ ê³„ì‚°í•˜ê¸°
+	double S = 0; // ê° ì ì— ëŒ€í•œ ë§ˆìŠ¤í¬ ì—°ì‚° í•©ê³„
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
-			S = 0.0; // ´©Àû ÃÊ±âÈ­
+			S = 0.0; // ëˆ„ì  ì´ˆê¸°í™”
 			for (int m = 0; m < MSIZE; m++) {
 				for (int n = 0; n < MSIZE; n++) {
 					S += mask[m][n] * tmpOriImage[i + m][k + n];
@@ -1278,7 +1278,7 @@ void sharpening() {
 			tarImage[i][k] = oriImage[i][k];
 		}
 	}
-	// ÀÓ½Ã Å¸°Ù --> Å¸°Ù
+	// ì„ì‹œ íƒ€ê²Ÿ --> íƒ€ê²Ÿ
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			double v = tmpTarImage[i][k];
@@ -1300,44 +1300,44 @@ void sharpening() {
 }
 void edge1() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
-	//const int MSIZE = 3; // ¸¶½ºÅ© Å©±â
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
+	//const int MSIZE = 3; // ë§ˆìŠ¤í¬ í¬ê¸°
 #define MSIZE 3
 	double mask[MSIZE][MSIZE] = {
 		{ 0.0, 0.0, 0.0 },
 		{ -1.0, 1.0, 0.0 },
 		{ 0.0, 0.0,-0.0 } };
 
-	// ÀÓ½Ã ÀÔÃâ·Â ¸Ş¸ğ¸® ÁØºñ
+	// ì„ì‹œ ì…ì¶œë ¥ ë©”ëª¨ë¦¬ ì¤€ë¹„
 	double** tmpOriImage, ** tmpTarImage;
 	tmpOriImage = mallocDouble(oriH + 2, oriW + 2);
 	tmpTarImage = mallocDouble(tarH, tarW);
-	// ÀÓ½Ã ¿øº» ÀÌ¹ÌÁö¿¡ 127 Ã¤¿ì±â(Æò±Õ°ªÀÌ ´õ ³ªÀ»µí...)
+	// ì„ì‹œ ì›ë³¸ ì´ë¯¸ì§€ì— 127 ì±„ìš°ê¸°(í‰ê· ê°’ì´ ë” ë‚˜ì„ë“¯...)
 	for (int i = 0; i < oriH + 2; i++) {
 		for (int k = 0; k < oriW + 2; k++) {
 			tmpOriImage[i][k] = 127.0;
 		}
 	}
-	// ¿øº» -> ÀÓ½Ã ¿øº»
+	// ì›ë³¸ -> ì„ì‹œ ì›ë³¸
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tmpOriImage[i + 1][k + 1] = oriImage[i][k];
 		}
 	}
-	// È¸¼± ¿¬»ê ---> ¸¶½ºÅ©·Î ±Ü¾î°¡¸é¼­ °è»êÇÏ±â
-	double S = 0; // °¢ Á¡¿¡ ´ëÇÑ ¸¶½ºÅ© ¿¬»ê ÇÕ°è
+	// íšŒì„  ì—°ì‚° ---> ë§ˆìŠ¤í¬ë¡œ ê¸ì–´ê°€ë©´ì„œ ê³„ì‚°í•˜ê¸°
+	double S = 0; // ê° ì ì— ëŒ€í•œ ë§ˆìŠ¤í¬ ì—°ì‚° í•©ê³„
 
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
-			S = 0.0; // ´©Àû ÃÊ±âÈ­
+			S = 0.0; // ëˆ„ì  ì´ˆê¸°í™”
 			for (int m = 0; m < MSIZE; m++) {
 				for (int n = 0; n < MSIZE; n++) {
 					S += mask[m][n] * tmpOriImage[i + m][k + n];
@@ -1347,7 +1347,7 @@ void edge1() {
 			tarImage[i][k] = oriImage[i][k];
 		}
 	}
-	// ÀÓ½Ã Å¸°Ù --> Å¸°Ù
+	// ì„ì‹œ íƒ€ê²Ÿ --> íƒ€ê²Ÿ
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			double v = tmpTarImage[i][k];
@@ -1369,46 +1369,46 @@ void edge1() {
 }
 void edge2() {
 	equalImage();
-	// (Áß¿ä!) °á°ú ¿µ»óÀÇ Å©±â¸¦ °áÁ¤ ---> ¾Ë°í¸®Áò¿¡ ÀÇÁ¸.
+	// (ì¤‘ìš”!) ê²°ê³¼ ì˜ìƒì˜ í¬ê¸°ë¥¼ ê²°ì • ---> ì•Œê³ ë¦¬ì¦˜ì— ì˜ì¡´.
 	tarH = oriH;
 	tarW = oriW;
-	// °á°ú ¿µ»ó ¸Ş¸ğ¸® ÇÒ´ç
-	// tarImage[tarH][tarW] Å©±â·Î ÇÒ´ç
+	// ê²°ê³¼ ì˜ìƒ ë©”ëª¨ë¦¬ í• ë‹¹
+	// tarImage[tarH][tarW] í¬ê¸°ë¡œ í• ë‹¹
 	freeTarImage();
 	mallocTarImage();
 
-	// *** ÁøÂ¥ ¿µ»óÃ³¸® ¾Ë°í¸®Áò ****
-	//const int MSIZE = 3; // ¸¶½ºÅ© Å©±â
+	// *** ì§„ì§œ ì˜ìƒì²˜ë¦¬ ì•Œê³ ë¦¬ì¦˜ ****
+	//const int MSIZE = 3; // ë§ˆìŠ¤í¬ í¬ê¸°
 #define MSIZE 3
 	double mask[MSIZE][MSIZE] = {
 		{ 0.0, -1.0, 0.0 },
 		{ 0.0, 1.0, 0.0 },
 		{ 0.0, 0.0, 0.0 } };
 
-	// ÀÓ½Ã ÀÔÃâ·Â ¸Ş¸ğ¸® ÁØºñ
+	// ì„ì‹œ ì…ì¶œë ¥ ë©”ëª¨ë¦¬ ì¤€ë¹„
 	double** tmpOriImage, ** tmpTarImage;
 	tmpOriImage = mallocDouble(oriH + 2, oriW + 2);
 	tmpTarImage = mallocDouble(tarH, tarW);
 
-	// ÀÓ½Ã ¿øº» ÀÌ¹ÌÁö¿¡ 127 Ã¤¿ì±â(Æò±Õ°ªÀÌ ´õ ³ªÀ»µí...)
+	// ì„ì‹œ ì›ë³¸ ì´ë¯¸ì§€ì— 127 ì±„ìš°ê¸°(í‰ê· ê°’ì´ ë” ë‚˜ì„ë“¯...)
 	for (int i = 0; i < oriH + 2; i++) {
 		for (int k = 0; k < oriW + 2; k++) {
 			tmpOriImage[i][k] = 127.0;
 		}
 	}
-	// ¿øº» -> ÀÓ½Ã ¿øº»
+	// ì›ë³¸ -> ì„ì‹œ ì›ë³¸
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
 			tmpOriImage[i + 1][k + 1] = oriImage[i][k];
 		}
 	}
 
-	// È¸¼± ¿¬»ê ---> ¸¶½ºÅ©·Î ±Ü¾î°¡¸é¼­ °è»êÇÏ±â
-	double S = 0; // °¢ Á¡¿¡ ´ëÇÑ ¸¶½ºÅ© ¿¬»ê ÇÕ°è
+	// íšŒì„  ì—°ì‚° ---> ë§ˆìŠ¤í¬ë¡œ ê¸ì–´ê°€ë©´ì„œ ê³„ì‚°í•˜ê¸°
+	double S = 0; // ê° ì ì— ëŒ€í•œ ë§ˆìŠ¤í¬ ì—°ì‚° í•©ê³„
 
 	for (int i = 0; i < oriH; i++) {
 		for (int k = 0; k < oriW; k++) {
-			S = 0.0; // ´©Àû ÃÊ±âÈ­
+			S = 0.0; // ëˆ„ì  ì´ˆê¸°í™”
 			for (int m = 0; m < MSIZE; m++) {
 				for (int n = 0; n < MSIZE; n++) {
 					S += mask[m][n] * tmpOriImage[i + m][k + n];
@@ -1418,7 +1418,7 @@ void edge2() {
 			tarImage[i][k] = oriImage[i][k];
 		}
 	}
-	// ÀÓ½Ã Å¸°Ù --> Å¸°Ù
+	// ì„ì‹œ íƒ€ê²Ÿ --> íƒ€ê²Ÿ
 	for (int i = 0; i < tarH; i++) {
 		for (int k = 0; k < tarW; k++) {
 			double v = tmpTarImage[i][k];
