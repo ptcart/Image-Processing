@@ -9,13 +9,11 @@
 1. [Introduction](#introduction)
 2. [Project Objective](#project-objective)
 3. [System Design](#system-design)
-4. [Implementation](#implementation)
-5. [Conclusion](#conclusion)
 
 ## Introduction
-이 프로젝트는 ...
+이 프로젝트는 C언어로 함으로써 영상처리 알고리즘을 많이 알아가는 시간을 가지는 것
 
-> **Note:** 여기에 프로젝트의 개요나 배경 설명을 추가하세요.
+> **Note:** 내가 알고있는 알고리즘을 최대한 활용하여 C 이외에 C++, Python으로도 구현가능할 것
 
 ## Project Objective
 프로젝트의 주요 목표는 ...
@@ -25,13 +23,5 @@
 
 ## System Design
 시스템 설계는 다음과 같이 구성됩니다:
-![image](https://github.com/user-attachments/assets/e2c1b153-42f3-411f-a316-918142cd8f61)
 
-### Module 1: 모듈 1 제목
-모듈 1의 설명...
-
-```mermaid
-graph TD;
-    A[Module 1] --> B[Component 1];
-    A --> C[Component 2];
-
+![image](https://github.com/user-attachments/assets/8ef4b29e-7efb-4cb4-92fc-ab09240683c6)
