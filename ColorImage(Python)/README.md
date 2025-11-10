@@ -1,4 +1,4 @@
-# 📝 Mini Project - Version 1
+# 📝 Mini Project - Version 2.5
 
 ## Project Overview
 - **Project Title:** 파이썬 영상처리 프로그래밍
